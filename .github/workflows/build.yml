@@ -1,0 +1,36 @@
+name: Build Converter
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * 0'  # Uruchamianie co niedzielę o północy
+  workflow_dispatch:  # Uruchamianie ręczne przez użytkownika
+
+jobs:
+  build:
+    runs-on: windows-latest  # Ustawienie na najnowszą wersję Windows
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Wersja Pythona
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller pyyaml lxml
+
+    - name: Build executable
+      run: pyinstaller --onefile converter.py
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: converter-exe
+        path: dist/converter.exe
+
